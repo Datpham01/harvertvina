@@ -44,6 +44,7 @@ public class CommomDataService {
 
 	public void commonData(Model model, User user) {
 		listCategoryByProductName(model);
+		listOriginsByProductName(model);
 		Integer totalSave = 0;
 		// get count yêu thích
 		if (user != null) {
@@ -66,6 +67,13 @@ public class CommomDataService {
 
 		List<Object[]> coutnProductByCategory = productRepository.listCategoryByProductName();
 		model.addAttribute("coutnProductByCategory", coutnProductByCategory);
+	}
+
+	// count product by origins
+	public void listOriginsByProductName(Model model) {
+
+		List<Object[]> countProductByOrigins = productRepository.listOriginByProductName();
+		model.addAttribute("countProductByCategory", countProductByOrigins);
 	}
 	
 	//sendEmail by order success

@@ -89,8 +89,9 @@
                         <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
+<!--                    add origin-->
                     <div class="modal-body">
-                      <form th:action="@{/admin/addOrigin}" th:object="${origin}" method="post">
+                      <form th:action="@{/admin/addOrigin}" th:object="${originAdd}" method="post">
                         <div class="row">
                           <div class="col-sm-12">
                             <div class="form-group form-group-default">
@@ -121,20 +122,13 @@
                     <th style="width: 10%">Action</th>
                   </tr>
                   </thead>
-                  <tfoot>
-                  <tr>
-                    <th>ID</th>
-                    <th>Tên xuất xứ</th>
-                    <th>Action</th>
-                  </tr>
-                  </tfoot>
                   <tbody>
                   <tr th:each="item : ${origins}">
                     <td>[[${item.originId}]]</td>
                     <td>[[${item.originName}]]</td>
                     <td>
                       <div class="form-button-action">
-                        <a th:href="@{/admin/editOrigin/{originId}(originId=${item.originId})}"
+                        <a th:href="@{/admin/editOrigin/{id}(id=${item.originId})}"
                            type="button" data-toggle="tooltip" title="" class="btn btn-link btn-primary btn-lg" data-original-title="Chỉnh sửa">
                           <i class="fa fa-edit"></i>
                         </a>
@@ -153,7 +147,7 @@
                 <script>
                   function showConfigModalDialog(id, name) {
                       $('#name').text(name);
-                      $('#yesOption').attr('href', '/admin/delete/'+id);
+                      $('#yesOption').attr('href', '/admin/origins/delete/'+id);
                       $('#configmationId').modal('show');
                   }
                 </script>

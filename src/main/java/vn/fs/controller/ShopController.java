@@ -153,4 +153,33 @@ public class ShopController extends CommomController {
 		return "web/shop";
 	}
 
+	// list books by origins
+	@GetMapping(value = "/productByOrigin")
+	public String listProductById(Model model, @RequestParam("id") Long id, User user) {
+		List<Product> products = productRepository.listProductByOrigin(id);
+
+		List<Product> listProductNew = new ArrayList<>();
+
+		for (Product product : products) {
+
+			Product productEntity = new Product();
+
+			BeanUtils.copyProperties(product, productEntity);
+
+			Favorite save = favoriteRepository.selectSaves(productEntity.getProductId(), user.getUserId());
+
+			if (save != null) {
+				productEntity.favorite = true;
+			} else {
+				productEntity.favorite = false;
+			}
+			listProductNew.add(productEntity);
+
+		}
+
+		model.addAttribute("products", listProductNew);
+		commomDataService.commonData(model, user);
+		return "web/shop";
+	}
+
 }

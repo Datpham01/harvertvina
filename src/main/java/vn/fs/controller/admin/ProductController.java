@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import vn.fs.entities.Category;
+import vn.fs.entities.Origins;
 import vn.fs.entities.Product;
 import vn.fs.entities.User;
 import vn.fs.repository.CategoryRepository;
+import vn.fs.repository.OriginsRepository;
 import vn.fs.repository.ProductRepository;
 import vn.fs.repository.UserRepository;
 
@@ -49,6 +51,9 @@ public class ProductController{
 	
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	private OriginsRepository originsRepository;
 	
 	@ModelAttribute(value = "user")
 	public User user(Model model, Principal principal, User user) {
@@ -90,17 +95,20 @@ public class ProductController{
 	public String addProduct(@ModelAttribute("product") Product product, ModelMap model,
 			@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
 
-		try {
+		String fileName = "rau-cu-qua-9679-1614753495.jpg";
+		if(!file.isEmpty()) {
+			try {
+				File convFile = new File(pathUploadImage + "/" + file.getOriginalFilename());
+				FileOutputStream fos = new FileOutputStream(convFile);
+				fos.write(file.getBytes());
+				fos.close();
+			} catch (IOException e) {
 
-			File convFile = new File(pathUploadImage + "/" + file.getOriginalFilename());
-			FileOutputStream fos = new FileOutputStream(convFile);
-			fos.write(file.getBytes());
-			fos.close();
-		} catch (IOException e) {
-
+			}
+			fileName = file.getOriginalFilename();
 		}
+		product.setProductImage(fileName);
 
-		product.setProductImage(file.getOriginalFilename());
 		Product p = productRepository.save(product);
 		if (null != p) {
 			model.addAttribute("message", "Update success");
@@ -120,6 +128,15 @@ public class ProductController{
 
 		return categoryList;
 	}
+
+	// show origin select option ở add product
+	@ModelAttribute("originList")
+	public List<Origins> showOrigin(Model model) {
+		List<Origins> originsList = originsRepository.findAll();
+		model.addAttribute("originList", originsList);
+
+		return originsList;
+	}
 	
 	// get Edit brand
 	@GetMapping(value = "/editProduct/{id}")
@@ -134,6 +151,8 @@ public class ProductController{
 	@PostMapping(value = "/updateProduct")
 	public String updateProduct(@ModelAttribute("product") Product product, Model model,
 	        @RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+
+		Product productEntity = productRepository.findById(product.getProductId()).orElse(null);
 
 	    // Kiểm tra nếu có file ảnh được tải lên
 	    if (!file.isEmpty()) {
@@ -151,6 +170,10 @@ public class ProductController{
 	            e.printStackTrace();
 	        }
 	    }
+
+	    if(productEntity.getProductImage() != null && file.isEmpty()) {
+	    	product.setProductImage(productEntity.getProductImage());
+		}
 
 	    // Lưu thông tin sản phẩm vào cơ sở dữ liệu
 	    Product updatedProduct = productRepository.save(product);

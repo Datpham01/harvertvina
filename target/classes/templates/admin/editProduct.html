@@ -100,6 +100,20 @@
 													</select>
 												</div>
 											</div>
+<!--											origin-->
+											<div class="col-md-6 pr-0">
+												<div class="form-group form-group-default">
+													<label>Xuất xứ</label>
+													<select class="form-control"
+															name="origin" th:field="*{origin.originId}" id="originId">
+														<option th:each="item : ${originList}"
+																th:value="${item.originId}" th:text="${item.originName}"
+																th:selected="${item.originId == product.origin.originId}">
+															Origin Name
+														</option>
+													</select>
+												</div>
+											</div>
 											<div class="col-md-6 pr-0">
 												<div class="form-group form-group-default">
 													<label>Đơn giá</label>

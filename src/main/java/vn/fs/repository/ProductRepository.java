@@ -17,6 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query(value = "SELECT * FROM products WHERE category_id = ?", nativeQuery = true)
 	public List<Product> listProductByCategory(Long categoryId);
 
+	// List product by origins
+	@Query(value = "SELECT * FROM products WHERE origin_id = ?", nativeQuery = true)
+	public List<Product> listProductByOrigin(Long originId);
+
 	// Top 10 product by category
 	@Query(value = "SELECT * FROM products AS b WHERE b.category_id = ?;", nativeQuery = true)
 	List<Product> listProductByCategory10(Long categoryId);
@@ -36,6 +40,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			+ "JOIN categories c ON p.category_id = c.category_id\r\n"
 			+ "GROUP BY c.category_name;" , nativeQuery = true)
 	List<Object[]> listCategoryByProductName();
+
+	// count quantity of products by origin
+	@Query(value = "SELECT c.origin_id,c.origin_name,\r\n"
+			+ "COUNT(*) AS SoLuong\r\n"
+			+ "FROM products p\r\n"
+			+ "JOIN origins c ON p.origin_id = c.origin_id\r\n"
+			+ "GROUP BY c.origin_name;" , nativeQuery = true)
+	List<Object[]> listOriginByProductName();
 	
 	// Top 20 product best sale
 	@Query(value = "SELECT p.product_id,\r\n"
