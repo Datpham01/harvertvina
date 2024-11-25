@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-	<title>Harvert ViNa - Trang quản trị</title>
+	<meta charset="UTF-8">
+	<title>Greenty - Trang quản trị</title>
 </head>
 <body>
-	<th:block th:fragment="header">
-		<div class="main-header">
+<th:block th:fragment="header">
+	<div class="main-header">
 		<!-- Logo Header -->
 		<div class="logo-header" data-background-color="white">
 			<a th:href="@{/admin/home}" class="logo">
@@ -28,7 +28,7 @@
 
 		<!-- Navbar Header -->
 		<nav class="navbar navbar-header navbar-expand-lg" style="background-color:#f57439">
-			
+
 			<div class="container-fluid">
 				<div class="collapse" id="search-nav">
 					<form class="navbar-left navbar-form nav-search mr-md-3">
@@ -43,7 +43,7 @@
 					</form>
 				</div>
 				<ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
-					
+
 					<li class="nav-item dropdown hidden-caret">
 						<a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false">
 							<div class="avatar-sm">
@@ -54,10 +54,10 @@
 							<div class="dropdown-user-scroll scrollbar-outer">
 								<li>
 									<div class="user-box">
-										<div class="avatar-lg"><img src="/assets/img/05.png" alt="image profile" class="avatar-img rounded">
+										<div class="avatar-lg"><img src="/assets/img/05.png" alt="image profile" class="avatar-img rounded"></div>
 										<div class="u-text">
 											<h4>Hi : [[${user.name}]]</h4>
-											
+
 										</div>
 									</div>
 								</li>

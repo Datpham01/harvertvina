@@ -113,6 +113,13 @@
 											                    <i class="fa fa-unlock"></i>
 											                </button>
 											            </form>
+														<!-- Nút xóa tài khoản -->
+														<button th:data-name="${item.userId}"
+																onclick="showConfigModalDialog(this.getAttribute('data-id'), this.getAttribute('data-name'))"
+																type="button" data-toggle="tooltip" title="" class="btn btn-link btn-danger" data-original-title="Xóa">
+															<i class="fa fa-times"></i>
+														</button>
+
 											        </div>
 											    </td>
 											</tr>

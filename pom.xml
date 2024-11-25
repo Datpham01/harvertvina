@@ -9,14 +9,14 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vn</groupId>
-	<artifactId>harvertvnshop</artifactId>
+	<artifactId>greenty-shop</artifactId>
 	<version>1.0</version>
 	<name>greenty-shop</name>
 	<description>greenty-shop</description>
     <properties>
-        <java.version>11</java.version>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
+        <java.version>16</java.version>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
     </properties>
 	<dependencies>
 		<dependency>
@@ -108,7 +108,14 @@
 			<artifactId>rest-api-sdk</artifactId>
 			<version>1.4.2</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.30</version> <!-- Thay bằng phiên bản mới nhất -->
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
