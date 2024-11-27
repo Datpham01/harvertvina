@@ -99,6 +99,12 @@
 																<input th:field="*{categoryName}" id="categoryName" type="text" class="form-control" placeholder="Tên thể lọai" required="required">
 															</div>
 														</div>
+<!--														<div class="col-sm-12">-->
+<!--															<div class="form-group form-group-default">-->
+<!--																<label>Images</label>-->
+<!--																<input type="file" id="categoryImage" name="file" class="form-control">-->
+<!--															</div>-->
+<!--														</div>-->
 													</div>
 													<div class="modal-footer no-bd">
 														<button type="submit" id="" class="btn btn-primary">Thêm</button>
@@ -118,6 +124,7 @@
 										<thead>
 											<tr>
 												<th>ID</th>
+<!--												<th>Images</th>-->
 												<th>Name</th>
 												<th style="width: 10%">Action</th>
 											</tr>
@@ -125,6 +132,7 @@
 										<tfoot>
 											<tr>
 												<th>ID</th>
+<!--												<th>Images</th>-->
 												<th>Name</th>
 												<th>Action</th>
 											</tr>
@@ -132,6 +140,9 @@
 										<tbody>
 											<tr th:each="item : ${categories}">
 												<td>[[${item.categoryId}]]</td>
+<!--												<td>-->
+<!--													<img th:src="@{'/loadImage?imageName='+${item.categoryImage}}" width="60px" alt="..." />-->
+<!--												</td>-->
 												<td>[[${item.categoryName}]]</td>
 												<td>
 													<div class="form-button-action">
