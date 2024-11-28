@@ -43,8 +43,4 @@ public class Comment implements Serializable {
 	@JoinColumn(name = "productId")
 	private Product product;
 
-	@OneToOne
-	@JoinColumn(name = "orderDetailId")
-	private OrderDetail orderDetail;
-
 }

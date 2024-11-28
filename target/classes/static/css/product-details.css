@@ -721,3 +721,50 @@
         margin-left: 30px
     }
 }
+
+.comment-section {
+    margin-top: 20px;
+}
+.comment {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.comment img {
+    width: 50px; /* Kích thước ảnh đại diện */
+    height: 50px;
+    border-radius: 50%; /* Bo tròn hình ảnh */
+    margin-right: 10px;
+}
+.comment-content {
+    flex-grow: 1; /* Để nội dung chiếm không gian còn lại */
+}
+.comment-date {
+    font-size: 0.9em;
+    color: #777;
+}
+.comment-form {
+    margin-top: 100px;
+}
+.comment-form textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+.comment-form button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.comment-form button:hover {
+    background-color: #218838;
+}
