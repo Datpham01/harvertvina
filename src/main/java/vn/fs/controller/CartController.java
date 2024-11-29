@@ -112,6 +112,28 @@ public class CartController extends CommomController {
 		return "redirect:/products";
 	}
 
+	// add cartItem
+	@GetMapping(value = "/addToCartProductDetail")
+	public String addToCartProductDetail(@RequestParam("id") Long id, HttpServletRequest request, Model model) {
+
+		Product product = productRepository.findById(id).orElse(null);
+
+		session = request.getSession();
+		Collection<CartItem> cartItems = shoppingCartService.getCartItems();
+		if (product != null) {
+			CartItem item = new CartItem();
+			BeanUtils.copyProperties(product, item);
+			item.setQuantity(1);
+			item.setProduct(product);
+			item.setId(id);
+			shoppingCartService.add(item);
+		}
+		session.setAttribute("cartItems", cartItems);
+		model.addAttribute("totalCartItems", shoppingCartService.getCount());
+
+		return "redirect:/productDetail?id=" + id;
+	}
+
 	
 	@GetMapping(value = "/remove/{id}")
 	public String remove(@PathVariable("id") Long id, HttpServletRequest request, Model model) {

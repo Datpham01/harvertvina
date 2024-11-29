@@ -58,7 +58,7 @@ xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 				
 					<th:block th:if="${#request.remoteUser}">
 						<a href="javascript:void(0);" class="header-widget" title="Tên của bạn">
-							<img src="/images/user.png" alt="user" />
+							<img th:src="${user.avatar != null ? '/api/avatar?fileName=' + user.avatar : '/images/user.png'}" alt="user" />
 							<span>Xin Chào!<strong><em>  [[${user.name}]]</em></strong></span>
 						</a>
 					</th:block>

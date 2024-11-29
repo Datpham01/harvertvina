@@ -134,7 +134,7 @@
                     <th:block th:if="${product.quantity != 0}">
                         <div class="details-add-group">
                             <a class="product-add1" style="background-color: #119744" title="Thêm giỏ hàng"
-                               th:if="${product.quantity > 0}" th:href="@{/addToCart(productId=${product.productId})}">
+                               th:if="${product.quantity > 0}" th:href="@{/addToCartProductDetail(id=${product.productId})}">
                                 <i style="color: white" class="fas fa-shopping-basket"></i>
                                 <span style="color: white">Thêm giỏ hàng</span>
                             </a>
