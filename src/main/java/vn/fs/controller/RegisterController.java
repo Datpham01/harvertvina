@@ -120,7 +120,7 @@ public class RegisterController {
 			User user = new User();
 			user.setAvatar(avatarFileName);
 			user.setEmail(dto.getEmail());
-			user.setName(dto.getEmail());
+			user.setName(dto.getName());
 			user.setPassword(bCryptPasswordEncoder.encode(password));
 			user.setRegisterDate(new Date());
 			user.setStatus(true);

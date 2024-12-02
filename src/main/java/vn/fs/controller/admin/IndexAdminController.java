@@ -2,9 +2,11 @@ package vn.fs.controller.admin;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,17 +34,35 @@ public class IndexAdminController{
 	 
 	 @Autowired
 	OrderDetailRepository orderDetailRepository;
-	
-	@ModelAttribute(value = "user")
-	public User user(Model model, Principal principal, User user) {
 
+	@ModelAttribute(value = "user")
+	public User user(Model model, Principal principal) {
 		if (principal != null) {
-			model.addAttribute("user", new User());
-			user = userRepository.findByEmail(principal.getName());
-			model.addAttribute("user", user);
+			if (principal instanceof OAuth2AuthenticationToken) {
+				OAuth2AuthenticationToken oAuth2Token = (OAuth2AuthenticationToken) principal;
+				Map<String, Object> attributes = oAuth2Token.getPrincipal().getAttributes();
+				String email = (String) attributes.get("email");
+
+				if (email != null) {
+					User user = userRepository.findByEmail(email);
+					if (user != null) {
+						model.addAttribute("user", user);
+						return user;
+					}
+				}
+			} else {
+				String email = principal.getName();
+				User user = userRepository.findByEmail(email);
+				if (user != null) {
+					model.addAttribute("user", user);
+					return user;
+				}
+			}
 		}
 
-		return user;
+		User anonymousUser = new User();
+		model.addAttribute("user", anonymousUser);
+		return anonymousUser;
 	}
 
 	@GetMapping(value = "/home")

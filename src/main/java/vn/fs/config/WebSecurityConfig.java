@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,75 +17,132 @@ import vn.fs.service.UserDetailService;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
-	
-	@Autowired
-	private UserDetailService userDetailService;
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Bean
+    @Autowired
+    private UserDetailService userDetailService;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
+    @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
-	@Bean
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userDetailService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }
-	
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());
-	}
-	
-	@Override
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());
+    }
+
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
     }
-	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		
-		http.csrf().disable();
-		
-		// Admin page
-        http.authorizeRequests().antMatchers("/admin/users").access("hasRole('ROLE_ADMIN')");
 
-//		http.authorizeRequests().antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')");
-        http.authorizeRequests().antMatchers("/admin/**").access("hasAnyRole('ROLE_ADMIN','ROLE_EMPLOYEE')");
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // Tắt CSRF (nếu cần, tùy vào yêu cầu ứng dụng)
+        http.csrf().disable();
 
-        
-		// If you are not logged in, you will be redirected to the /login page.
-		http.authorizeRequests().antMatchers("/checkout").access("hasRole('ROLE_USER')");
-		
-		http.authorizeRequests()
-			.antMatchers("/**").permitAll()
-			.anyRequest().authenticated()
-			.and()
-		.formLogin()
-			.loginProcessingUrl("/doLogin")
-			.loginPage("/login")
-			.defaultSuccessUrl("/?login_success")
-			.successHandler(new SuccessHandler()).failureUrl("/login?error=true&accountLocked=true")
-			.failureUrl("/login?error=true")
-			.permitAll()
-			.and()
-		.logout()
-			.invalidateHttpSession(true)
-			.clearAuthentication(true)
-			.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-			.logoutSuccessUrl("/?logout_success")
-			.permitAll();
-			
-		 // remember-me
-		http.rememberMe()
-			.rememberMeParameter("remember");
-		
-	    http.exceptionHandling()
-        .accessDeniedPage("/web/notFound");
-		
-	}
+        // Cấu hình phân quyền truy cập cho các trang
+        http.authorizeRequests()
+                .antMatchers("/admin/users").hasRole("ADMIN") // Chỉ cho phép ADMIN truy cập
+                .antMatchers("/admin/**").hasAnyRole("ADMIN", "EMPLOYEE") // Cho phép ADMIN và EMPLOYEE truy cập
+                .antMatchers("/checkout").hasRole("USER") // Chỉ cho phép USER truy cập
+                .antMatchers("/**").permitAll() // Cho phép tất cả truy cập không hạn chế
+                .anyRequest().authenticated() // Bắt buộc xác thực cho mọi yêu cầu khác
+                .and()
+
+                // Cấu hình đăng nhập OAuth2 (Google, Facebook, v.v.)
+                .oauth2Login()
+                .loginPage("/login") // Trang đăng nhập
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler(new CustomSuccessHandler())
+                .failureUrl("/login?error=true")
+                .and()
+
+                // Cấu hình đăng nhập thông qua form (login form-based authentication)
+                .formLogin()
+                .loginProcessingUrl("/doLogin") // Xử lý đăng nhập
+                .loginPage("/login") // Trang đăng nhập
+                .defaultSuccessUrl("/?login_success") // Đăng nhập thành công
+                .successHandler(new SuccessHandler()) // Xử lý thành công tùy chỉnh
+                .failureUrl("/login?error=true") // Đăng nhập thất bại
+                .permitAll() // Cho phép tất cả truy cập trang login
+                .and()
+
+                // Cấu hình đăng xuất
+                .logout()
+                .invalidateHttpSession(true) // Hủy session khi đăng xuất
+                .clearAuthentication(true) // Xóa xác thực khi đăng xuất
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // Định nghĩa đường dẫn đăng xuất
+                .logoutSuccessUrl("/?logout_success") // Sau khi đăng xuất thành công
+                .permitAll() // Cho phép tất cả truy cập đăng xuất
+                .and()
+
+                // Cấu hình Remember Me (giữ người dùng đăng nhập lâu hơn)
+                .rememberMe()
+                .rememberMeParameter("remember") // Tham số "remember-me"
+                .and()
+
+                // Cấu hình xử lý lỗi truy cập (khi người dùng không có quyền truy cập)
+                .exceptionHandling()
+                .accessDeniedPage("/web/notFound"); // Trang lỗi khi truy cập bị từ chối
+    }
+
+    //	@Override
+//	protected void configure(HttpSecurity http) throws Exception {
+//
+//		http.csrf().disable();
+//
+//		// Admin page
+//        http.authorizeRequests().antMatchers("/admin/users").access("hasRole('ROLE_ADMIN')");
+//
+////		http.authorizeRequests().antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')");
+//        http.authorizeRequests().antMatchers("/admin/**").access("hasAnyRole('ROLE_ADMIN','ROLE_EMPLOYEE')");
+//
+//
+//		// If you are not logged in, you will be redirected to the /login page.
+//		http.authorizeRequests().antMatchers("/checkout").access("hasRole('ROLE_USER')");
+//
+//		http.authorizeRequests()
+//			.antMatchers("/**").permitAll()
+//			.anyRequest().authenticated()
+//			.and()
+//		.formLogin()
+//			.loginProcessingUrl("/doLogin")
+//			.loginPage("/login")
+//			.defaultSuccessUrl("/?login_success")
+//			.successHandler(new SuccessHandler()).failureUrl("/login?error=true&accountLocked=true")
+//			.failureUrl("/login?error=true")
+//			.permitAll()
+//			.and()
+//		.logout()
+//			.invalidateHttpSession(true)
+//			.clearAuthentication(true)
+//			.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//			.logoutSuccessUrl("/?logout_success")
+//			.permitAll();
+//
+//		 // remember-me
+//		http.rememberMe()
+//			.rememberMeParameter("remember");
+//
+//	    http.exceptionHandling()
+//        .accessDeniedPage("/web/notFound");
+//
+//	}
+
 
 }
