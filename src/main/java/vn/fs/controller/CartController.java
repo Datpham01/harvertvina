@@ -33,6 +33,7 @@ import com.paypal.base.rest.PayPalRESTException;
 import vn.fs.commom.CommomDataService;
 import vn.fs.config.PaypalPaymentIntent;
 import vn.fs.config.PaypalPaymentMethod;
+import vn.fs.config.vnpayconfig.VNPAYService;
 import vn.fs.entities.CartItem;
 import vn.fs.entities.Order;
 import vn.fs.entities.OrderDetail;
@@ -65,6 +66,9 @@ public class CartController extends CommomController {
 
 	@Autowired
 	OrderDetailRepository orderDetailRepository;
+
+	@Autowired
+	VNPAYService vnpayService;
 
 	public Order orderFinal = new Order();
 
@@ -216,16 +220,37 @@ public class CartController extends CommomController {
 			} catch (PayPalRESTException e) {
 				log.error(e.getMessage());
 			}
+		} else if(StringUtils.equals(checkOut,"vnpay")) {
+			Date date = new Date();
+			order.setStatus(0);
+			order.setOrderDate(date);
+			order.setUser(user);
+			order.setAmount(totalPrice);
+			order = orderRepository.save(order);
 
+			for (CartItem cartItem : cartItems) {
+				OrderDetail orderDetail = new OrderDetail();
+				orderDetail.setQuantity(cartItem.getQuantity());
+				orderDetail.setOrder(order);
+				orderDetail.setProduct(cartItem.getProduct());
+				double unitPrice = cartItem.getProduct().getPrice();
+				orderDetail.setPrice(unitPrice);
+				orderDetailRepository.save(orderDetail);
+			}
+
+			String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+			int amount = (int) totalPrice;
+ 			String vnpayUrl = vnpayService.createOrder(request,amount, order.getOrderId().toString(), baseUrl);
+			return "redirect:" + vnpayUrl;
 		}
 
 		session = request.getSession();
 		Date date = new Date();
-		order.setOrderDate(date);
 		order.setStatus(0);
+		order.setOrderDate(date);
+		order.setUser(user);
 		order.getOrderId();
 		order.setAmount(totalPrice);
-		order.setUser(user);
 
 		orderRepository.save(order);
 
